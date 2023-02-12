@@ -14,6 +14,16 @@ namespace BackAppPFE.Context
         {
             modelBuilder.Entity<User>().ToTable("users");
         }
+
+        internal object GetSection(string v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Priority> Priorities { get; set; }
+        public DbSet<Models.Type> Types { get; set; }
+
     }
    
 }

@@ -40,5 +40,10 @@ namespace BackAppPFE.Helpers
             return true;
 
         }
+
+        internal static void HashPassword(object password)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

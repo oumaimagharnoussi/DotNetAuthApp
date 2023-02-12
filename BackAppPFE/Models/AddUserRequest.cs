@@ -1,11 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BackAppPFE.Models
+﻿namespace BackAppPFE.Models
 {
-    public class User
+    public class AddUserRequest
     {
-        [Key]
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }
@@ -13,7 +9,5 @@ namespace BackAppPFE.Models
         public string Token { get; set; }
         public string Role { get; set; }
         public string Email { get; set; }
-        //public string Image { get; set; }
-        //public double Tel { get; set; }
     }
 }

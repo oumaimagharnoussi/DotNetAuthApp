@@ -86,3 +86,4 @@ C:\Users\gharn\Desktop\BackAppPFE\BackAppPFE\obj\Debug\net6.0\refint\BackAppPFE.
 C:\Users\gharn\Desktop\BackAppPFE\BackAppPFE\obj\Debug\net6.0\BackAppPFE.pdb
 C:\Users\gharn\Desktop\BackAppPFE\BackAppPFE\obj\Debug\net6.0\BackAppPFE.genruntimeconfig.cache
 C:\Users\gharn\Desktop\BackAppPFE\BackAppPFE\obj\Debug\net6.0\ref\BackAppPFE.dll
+C:\Users\gharn\Desktop\BackAppPFE\BackAppPFE\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.InMemory.dll
