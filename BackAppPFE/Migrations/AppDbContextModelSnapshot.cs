@@ -54,8 +54,8 @@ namespace BackAppPFE.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(1000)");
 
-                    b.Property<Guid?>("ImageId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("ImageuserId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("PriorityID")
                         .HasColumnType("int");
@@ -72,7 +72,7 @@ namespace BackAppPFE.Migrations
 
                     b.HasKey("TicketId");
 
-                    b.HasIndex("ImageId");
+                    b.HasIndex("ImageuserId");
 
                     b.HasIndex("PriorityID");
 
@@ -100,18 +100,11 @@ namespace BackAppPFE.Migrations
 
             modelBuilder.Entity("BackAppPFE.Models.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("userId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("userId"));
 
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
@@ -122,10 +115,28 @@ namespace BackAppPFE.Migrations
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("firstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("qualification")
+                        .HasColumnType("int");
+
+                    b.Property<string>("userName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("userId");
 
                     b.ToTable("users", (string)null);
                 });
@@ -134,7 +145,7 @@ namespace BackAppPFE.Migrations
                 {
                     b.HasOne("BackAppPFE.Models.User", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId");
+                        .HasForeignKey("ImageuserId");
 
                     b.HasOne("BackAppPFE.Models.Priority", "Priority")
                         .WithMany()

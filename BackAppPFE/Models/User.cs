@@ -13,7 +13,9 @@ namespace BackAppPFE.Models
         public string Token { get; set; }
         public string Role { get; set; }
         public string Email { get; set; }
-        //public string Image { get; set; }
-        //public double Tel { get; set; }
+        public string ResetPasswordToken { get; set; }
+        public DateTime ResetPasswordExpiry { get; set; }
+
+
     }
 }

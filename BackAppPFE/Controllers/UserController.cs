@@ -15,7 +15,9 @@ using Microsoft.Extensions.Configuration;
 using System.Runtime.InteropServices;
 using System.Data;
 using System.Net.Http.Headers;
-
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Security.Cryptography;
+using BackAppPFE.UtilityService;
 
 namespace BackAppPFE.Controllers
 {
@@ -23,16 +25,18 @@ namespace BackAppPFE.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        
+
         private readonly AppDbContext _authContext;
         private readonly IConfiguration _configuration;
-        public UserController(IConfiguration configuration, AppDbContext appDbContext)
+        private readonly IEmailService _emailService;
+        public UserController(IConfiguration configuration, AppDbContext appDbContext, IEmailService emailService)
         {
             _configuration = configuration;
             _authContext = appDbContext;
+            _emailService = emailService;
         }
 
-        
+
 
         [HttpPost("authentificate")]
         public async Task<IActionResult> Authenticate([FromBody] User userObj)
@@ -52,11 +56,11 @@ namespace BackAppPFE.Controllers
             user.Token = CreateToken(user);
             //user.Token = CreateJwt(user);
 
-             return Ok(new
-             {
-                 Token = user.Token,
-                 Message = "Login Success!"
-             }); 
+            return Ok(new
+            {
+                Token = user.Token,
+                Message = "Login Success!"
+            });
             //return Ok(token);
         }
 
@@ -144,7 +148,6 @@ namespace BackAppPFE.Controllers
                  new Claim(ClaimTypes.Role, user.Role),
                  new Claim(ClaimTypes.Name,$"{user.LastName}")
              });
-
              var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
              var tokenDescriptor = new SecurityTokenDescriptor
              {
@@ -155,16 +158,14 @@ namespace BackAppPFE.Controllers
              };
              var token = jwtTokenHandler.CreateToken(tokenDescriptor);
              return jwtTokenHandler.WriteToken(token);
-
          } 
-
           */
         //get all users
         [HttpGet]
-         public async Task<ActionResult<User>> GetAllUsers()
-         {
-             return Ok(await _authContext.Users.ToListAsync());
-         }
+        public async Task<ActionResult<User>> GetAllUsers()
+        {
+            return Ok(await _authContext.Users.ToListAsync());
+        }
 
         //crud
         [HttpPost]
@@ -172,7 +173,7 @@ namespace BackAppPFE.Controllers
         {
             var user = new User()
             {
-                
+
                 FirstName = addUserRequest.FirstName,
                 LastName = addUserRequest.LastName,
                 Username = addUserRequest.Username,
@@ -184,15 +185,15 @@ namespace BackAppPFE.Controllers
             user.Password = PasswordHasher.HashPassword(user.Password);
             await _authContext.Users.AddAsync(user);
             await _authContext.SaveChangesAsync();
-            
-            
+
+
 
             return Ok(user);
         }
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] int id,UpdateUserRequest updateUserRequest)
+        public async Task<IActionResult> UpdateUser([FromRoute] int id, UpdateUserRequest updateUserRequest)
         {
             var user = await _authContext.Users.FindAsync(id);
             if (User != null)
@@ -238,6 +239,67 @@ namespace BackAppPFE.Controllers
             }
             return NotFound();
         }
-    }
 
+
+        [HttpPost("send-reset-email/{email}")]
+        public async Task<IActionResult> SendEmail(string email)
+        {
+            var user = await _authContext.Users.FirstOrDefaultAsync(a => a.Email == email);
+            if(user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 404,
+                    Message = "email Doesn't Exist"
+                });
+            }
+            var tokenBytes = RandomNumberGenerator.GetBytes(64);
+            var emailToken = Convert.ToBase64String(tokenBytes);
+            user.ResetPasswordToken = emailToken;
+            user.ResetPasswordExpiry = DateTime.Now.AddMinutes(15);
+            string from = _configuration["EmailSettings: From"];
+            var emailModel = new Email(email, "Reset Password !!", EmailBody.EmailStringBody(email, emailToken));
+            _emailService.SendEmail(emailModel);
+            _authContext.Entry(user).State = EntityState.Modified;
+            await _authContext.SaveChangesAsync();
+            return Ok(new
+            {
+                StatusCode = 200,
+                Message = "Email Sent!"
+            });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPassword resetPassword)
+        {
+            var newToken = resetPassword.EmailToken.Replace("", "+");
+            var user = await _authContext.Users.AsNoTracking().FirstOrDefaultAsync(a => a.Email == resetPassword.Email);
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 404,
+                    Message = "user Doesn't Exist"
+                });
+            }
+            var tokenCode = user.ResetPasswordToken;
+            DateTime emailTokenExpiry = user.ResetPasswordExpiry;
+            if (tokenCode != resetPassword.EmailToken || emailTokenExpiry < DateTime.Now)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = 400,
+                    Message = "Invalid Reset Link"
+                });
+            }
+            user.Password = PasswordHasher.HashPassword(resetPassword.NewPasswrd);
+            _authContext.Entry(user).State = EntityState.Modified;
+            await _authContext.SaveChangesAsync();
+            return Ok(new
+            {
+                StatusCode = 200,
+                Message = "Password Reset Successfully"
+            });
+        }
+    }
 }

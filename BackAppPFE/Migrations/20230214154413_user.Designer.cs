@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackAppPFE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230209175344_v3")]
-    partial class v3
+    [Migration("20230214154413_user")]
+    partial class user
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,7 +57,7 @@ namespace BackAppPFE.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(1000)");
 
-                    b.Property<int?>("ImageId")
+                    b.Property<int?>("ImageuserId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PriorityID")
@@ -75,7 +75,7 @@ namespace BackAppPFE.Migrations
 
                     b.HasKey("TicketId");
 
-                    b.HasIndex("ImageId");
+                    b.HasIndex("ImageuserId");
 
                     b.HasIndex("PriorityID");
 
@@ -103,23 +103,11 @@ namespace BackAppPFE.Migrations
 
             modelBuilder.Entity("BackAppPFE.Models.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("userId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("userId"));
 
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
@@ -127,16 +115,31 @@ namespace BackAppPFE.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tel")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("firstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("qualification")
+                        .HasColumnType("int");
+
+                    b.Property<string>("userName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("userId");
 
                     b.ToTable("users", (string)null);
                 });
@@ -145,7 +148,7 @@ namespace BackAppPFE.Migrations
                 {
                     b.HasOne("BackAppPFE.Models.User", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId");
+                        .HasForeignKey("ImageuserId");
 
                     b.HasOne("BackAppPFE.Models.Priority", "Priority")
                         .WithMany()

@@ -4,6 +4,7 @@
     {
         TelnetSfax,
         TelnetTunis,
-        TelnetAriana
+        TelnetAriana,
+        TelnetCentreUrbainNord
     }
 }
